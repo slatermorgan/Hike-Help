@@ -5,15 +5,26 @@ var middleware = require("../middleware")
 
 // INDEX - show all walks
 router.get("/", function(req, res){
-    // Get all walks from DB
-    Walk.find({}, function(err, allWalks){
-        if(err){
-            console.log(err);
-        } else {
-            res.render("walks/index", {walks: allWalks, currentUser: req.user})
-        }
-    });
-    //   res.render("walks", {walks:walks});
+    if(req.query.search){
+        const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+        // Get all walks from DB
+        Walk.find({name: regex}, function(err, allWalks){
+            if(err){
+                console.log(err);
+            } else {
+                res.render("walks/index", {walks: allWalks, currentUser: req.user})
+            }
+        });
+    } else {
+        // Get all walks from DB
+        Walk.find({}, function(err, allWalks){
+            if(err){
+                console.log(err);
+            } else {
+                res.render("walks/index", {walks: allWalks, currentUser: req.user})
+            }
+        });
+    }
 });
 
 // CREATE - adds new walk to DB
@@ -89,12 +100,8 @@ router.delete("/:id", middleware.checkWalkOwnership, function(req, res){
     });
 });
 
-//Middleware
-function isLoggedIn(req, res, next){
-    if(req.isAuthenticated()){
-        return next();
-    }
-    res.redirect("/login");
-}
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
 
 module.exports = router;
