@@ -14,7 +14,7 @@ middlewareObj.checkWalkOwnership = function(req, res, next) {
             } else {
                 // does the user own walk?
                 // if foundWalk.author.id === req.user._id
-                if(foundWalk.author.id.equals(req.user._id)){
+                if(foundWalk.author.id.equals(req.user._id) || req.user.isAdmin){
                     next(); 
                 } else {
                     req.flash("error", "You don't have permission to do that")
@@ -38,7 +38,7 @@ middlewareObj.checkCommentOwnership = function(req, res, next) {
             } else {
                 // does the user own comment?
                 // if foundComment.author.id === req.user._id
-                if(foundComment.author.id.equals(req.user._id)){
+                if(foundComment.author.id.equals(req.user._id) || req.user.isAdmin){
                     next(); 
                 } else {
                     req.flash("error", "You dont have permission to do that")

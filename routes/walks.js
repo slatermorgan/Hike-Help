@@ -12,7 +12,12 @@ router.get("/", function(req, res){
             if(err){
                 console.log(err);
             } else {
-                res.render("walks/index", {walks: allWalks, currentUser: req.user})
+                if(allWalks.length > 0) {
+                    res.render("walks/index",{walks :allWalks});
+                } else {
+                    req.flash("error", "No walk matching that search. Please try again.");
+                    res.redirect("back");
+                }
             }
         });
     } else {
