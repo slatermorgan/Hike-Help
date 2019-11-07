@@ -6,13 +6,20 @@
         <div style="width: 30%; margin: 25px auto;">
             <form action="/walks" method="POST">
                 <div class="form-group">
+                    <label for="name">Name</label>
                     <input class="form-control" type="text" name="name" placeholder="name">
                 </div>    
                 <div class="form-group">
+                    <label for="image">Image</label>
                     <input class="form-control" type="text" name="image" placeholder="image url">
                 </div>
                 <div class="form-group">
+                    <label for="description">Description</label>
                     <input class="form-control" type="text" name="description" placeholder="description">
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input class="form-control" type="text" name="location" id="location" placeholder="Yosemite National Park, CA">
                 </div>
                 <div class="form-group">
                     <button class="btn btn-lg btn-primary btn-block">Submit</button>

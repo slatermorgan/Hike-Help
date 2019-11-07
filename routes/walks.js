@@ -1,7 +1,18 @@
 var express = require("express");
 var router  = express.Router();
 var Walk    = require("../models/walk");
-var middleware = require("../middleware")
+var middleware = require("../middleware");
+
+var NodeGeocoder = require('node-geocoder');
+ 
+var options = {
+  provider: 'google',
+  httpAdapter: 'https',
+  apiKey: process.env.GEOCODER_API_KEY,
+  formatter: null
+};
+ 
+var geocoder = NodeGeocoder(options);
 
 // INDEX - show all walks
 router.get("/", function(req, res){
@@ -32,26 +43,40 @@ router.get("/", function(req, res){
     }
 });
 
-// CREATE - adds new walk to DB
+//CREATE - add new walk to DB
 router.post("/", middleware.isLoggedIn, function(req, res){
-        // get data from form + add to array
-        var name = req.body.name;
-        var image = req.body.image;
-        var desc = req.body.description;
-        var author = {
-            id: req.user._id,
-            username: req.user.username
+    // get data from form and add to walk array
+    var name = req.body.name;
+    var image = req.body.image;
+    var desc = req.body.description;
+    var author = {
+        id: req.user._id,
+        username: req.user.username
+    }
+    geocoder.geocode(req.body.location, function (err, data) {
+        if (err || !data.length) {
+            console.log(err);
+            req.flash('error', 'Invalid address');
+            return res.redirect('back');
         }
-        var newWalk = {name:name, image:image, description:desc, author: author}
-        // Create new walk and save to DB
+
+        var lat = data[0].latitude;
+        var lng = data[0].longitude;
+        
+        var location = data[0].formattedAddress;
+        var newWalk = {name: name, image: image, description: desc, author:author, location: location, lat: lat, lng: lng};
+
+        // Create a new walk and save to DB
         Walk.create(newWalk, function(err, newlyCreated){
             if(err){
                 console.log(err);
             } else {
-                // redirect back to walks page
-                res.redirect("/walks")
+                //redirect back to walks page
+                console.log(newlyCreated);
+                res.redirect("/walks");
             }
-        })
+        });
+    });
 });
 
 // NEW - shows form to create new walk
@@ -81,17 +106,27 @@ router.get("/:id/edit", middleware.checkWalkOwnership, function(req, res) {
     });
 });
 
-// UPDATE - submits form
+// UPDATE WALK ROUTE
 router.put("/:id", middleware.checkWalkOwnership, function(req, res){
-    // find the update the walk
-    Walk.findByIdAndUpdate(req.params.id, req.body.walk, function(err, updatedWalk){
-        if(err){
-            res.redirect("/walks");
-        } else {
-            res.redirect("/walks/" + req.params.id);
+    geocoder.geocode(req.body.location, function (err, data) {
+        if (err || !data.length) {
+            req.flash('error', 'Invalid address');
+            return res.redirect('back');
         }
-    })
-    // redirect to show page
+        req.body.walk.lat = data[0].latitude;
+        req.body.walk.lng = data[0].longitude;
+        req.body.walk.location = data[0].formattedAddress;
+
+        Walk.findByIdAndUpdate(req.params.id, req.body.walk, function(err, walk){
+            if(err){
+                req.flash("error", err.message);
+                res.redirect("back");
+            } else {
+                req.flash("success","Successfully Updated!");
+                res.redirect("/walks/" + walk._id);
+            }
+        });
+    });
 });
 
 // DESTROY - deletes walk
