@@ -52,6 +52,6 @@ app.use(indexRoutes);
 app.use("/walks", walkRoutes);
 app.use("/walks/:id/comments", commentRoutes);
 
-app.listen(3000, process.env.IP, function () {
+app.listen(process.env.PORT, process.env.IP, function () {
     console.log("Hike Help Server Initilised" + process.env.IP);
 });
