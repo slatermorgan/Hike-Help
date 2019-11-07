@@ -4,6 +4,7 @@
   "description": "an app to help with walking",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "morgan-slater",
