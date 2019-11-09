@@ -6,6 +6,7 @@ var walkSchema = new mongoose.Schema({
    image: String,
    description: String,
    location: String,
+   difficulty: String,
    lat: Number,
    lng: Number,
    createdAt: { type: Date, default: Date.now },

@@ -49,6 +49,7 @@ router.post("/", middleware.isLoggedIn, function(req, res){
     var name = req.body.name;
     var image = req.body.image;
     var desc = req.body.description;
+    var difficulty = req.body.difficulty;
     var author = {
         id: req.user._id,
         username: req.user.username
@@ -64,7 +65,16 @@ router.post("/", middleware.isLoggedIn, function(req, res){
         var lng = data[0].longitude;
         
         var location = data[0].formattedAddress;
-        var newWalk = {name: name, image: image, description: desc, author:author, location: location, lat: lat, lng: lng};
+        var newWalk = {
+                name: name,
+                image: image,
+                description: desc,
+                author:author,
+                location: location,
+                difficulty: difficulty,
+                lat: lat,
+                lng: lng
+            };
 
         // Create a new walk and save to DB
         Walk.create(newWalk, function(err, newlyCreated){
@@ -113,6 +123,8 @@ router.put("/:id", middleware.checkWalkOwnership, function(req, res){
             req.flash('error', 'Invalid address');
             return res.redirect('back');
         }
+        console.log('req.body:');
+        console.log(req.body);
         req.body.walk.lat = data[0].latitude;
         req.body.walk.lng = data[0].longitude;
         req.body.walk.location = data[0].formattedAddress;
