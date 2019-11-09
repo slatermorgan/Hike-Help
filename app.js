@@ -27,6 +27,8 @@ app.use(flash());
 
 // seedDB(); //seeds the database
 
+app.locals.moment = require('moment');
+
 // Passport Config
 app.use(require("express-session")({
     secret: "snowdonia walks are the best",
